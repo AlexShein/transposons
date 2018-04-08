@@ -4,6 +4,7 @@ from operator import add
 import argparse
 import pandas as pd
 import sys
+from collections import OrderedDict
 
 
 LS = ('LS0', 'LS1', 'LS2', 'LS3', 'LS4', 'LS5', 'LS6', 'LS7', 'LS8', 'LS9')
@@ -20,9 +21,6 @@ PROPERTIES = (
     'Enthalpy (RNA)',
     'Entropy (RNA)',
     'Free energy (RNA)',
-    'Free energy (RNA)',
-    'Enthalpy (RNA)',
-    'Entropy (RNA)',
     'GC content',
     'Purine (AG) content',
     'Keto (GT) content',
@@ -31,9 +29,9 @@ PROPERTIES = (
     'Cytosine content',
     'Thymine content',
     'Hydrophilicity (RNA)',
-    'Hydrophilicity (RNA)',
 )
 STATISTICS = ('GC precentage',)
+IS_TARGET = 'is_'
 
 
 def get_triplets(lst):
@@ -67,7 +65,8 @@ def get_header():
 
 def parse_line(line):
     """
-    Returns 3 dicts with left and rights parts of stem and loop.
+    Returns a list with left and rights parts of stem and loop and ther indexing.
+    [('LS0', 'T'), ('LS1', 'A'), ('LS2', 'T'),...]
     """
     splitted_line = list(filter(bool, line.split(' ')))
     ls = splitted_line[4][::-1].upper()[:10]
@@ -76,18 +75,35 @@ def parse_line(line):
     return list(zip(LS[:len(ls)], ls)) + list(zip(RS[:len(rs)], rs)) + list(zip(LOOP[:len(loop)], loop))
 
 
-def get_dinucleotides_properties_dict(nucleotides_list):
+def get_dinucleotides_properties_dict(nucleotides_list, properties_df):
+    """
+    Recieves list of pairs [('LS0', 'T'), ('LS1', 'A'), ('LS2', 'T'),...]
+    Returns ordered dict with items like
+    [('LS0LS1 - Shift (RNA)', -0.02), ('LS0LS1 - Slide (RNA)', -1.45), ...]
+    """
+    line_dict = OrderedDict()
+    for pair in get_pairs(nucleotides_list):
+        dinucleotide = pair[0][1] + pair[1][1]
+        position = pair[0][0] + pair[1][0]
+        if pair[0][1] == '_' or pair[1][1] == '_':
+            prop_values = {prop: 0 for prop in PROPERTIES}
+        else:
+            prop_values = properties_df[properties_df['Dinucleotide'] == dinucleotide]
+        for prop in PROPERTIES:
+            line_dict[(position + ' - ' + prop)] = float(prop_values[prop])
+    return line_dict
+
+
+def count_statistics(line):
+    """
+    returns dict
+    """
     pass
 
 
 if __name__ == 'main':
-    properties_df = pd.read_csv('DiPropretiesT.csv')
+    properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
     processed_lines = []
     for line in sys.stdin:
-        line_dict = {}
         nucleotides_list = parse_line(line)
-
-        for nucleotide in nucleotides_list:
-            for property in PROPERTIES:
-                pass
-                # value = properties_df[]
+        line_dict = get_dinucleotides_properties_dict(nucleotides_list, properties_df)
