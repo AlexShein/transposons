@@ -1,10 +1,10 @@
+from collections import OrderedDict
 from functools import reduce
 from itertools import product
 from operator import add
 import argparse
 import pandas as pd
 import sys
-from collections import OrderedDict
 
 
 LS = ('LS0', 'LS1', 'LS2', 'LS3', 'LS4', 'LS5', 'LS6', 'LS7', 'LS8', 'LS9')
@@ -31,7 +31,18 @@ PROPERTIES = (
     'Hydrophilicity (RNA)',
 )
 STATISTICS = ('GC precentage',)
-IS_TARGET = 'is_'
+IS_TARGET = 'is_target'
+
+DINUCLEOTIDES = [
+    'AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 'GA', 'GT', 'GG', 'GC', 'CA', 'CT', 'CG', 'CC'
+]
+TRINUCLEOTIDES = [
+    'AAA', 'AAT', 'AAG', 'AAC', 'ATA', 'ATT', 'ATG', 'ATC', 'AGA', 'AGT', 'AGG', 'AGC', 'ACA', 'ACT', 'ACG',
+    'ACC', 'TAA', 'TAT', 'TAG', 'TAC', 'TTA', 'TTT', 'TTG', 'TTC', 'TGA', 'TGT', 'TGG', 'TGC', 'TCA', 'TCT',
+    'TCG', 'TCC', 'GAA', 'GAT', 'GAG', 'GAC', 'GTA', 'GTT', 'GTG', 'GTC', 'GGA', 'GGT', 'GGG', 'GGC', 'GCA',
+    'GCT', 'GCG', 'GCC', 'CAA', 'CAT', 'CAG', 'CAC', 'CTA', 'CTT', 'CTG', 'CTC', 'CGA', 'CGT', 'CGG', 'CGC',
+    'CCA', 'CCT', 'CCG', 'CCC'
+]
 
 
 def get_triplets(lst):
@@ -72,7 +83,10 @@ def parse_line(line):
     ls = splitted_line[4][::-1].upper()[:10]
     rs = splitted_line[5].upper()[:10]
     loop = splitted_line[6]
-    return list(zip(LS[:len(ls)], ls)) + list(zip(RS[:len(rs)], rs)) + list(zip(LOOP[:len(loop)], loop))
+    return (
+        list(zip(LS[:len(ls)], ls)) + list(zip(RS[:len(rs)], rs)) + list(zip(LOOP[:len(loop)], loop)),
+        ls + loop + rs,
+    )
 
 
 def get_dinucleotides_properties_dict(nucleotides_list, properties_df):
@@ -94,7 +108,7 @@ def get_dinucleotides_properties_dict(nucleotides_list, properties_df):
     return line_dict
 
 
-def count_statistics(line):
+def count_statistics(sequence):
     """
     returns dict
     """
@@ -105,5 +119,6 @@ if __name__ == 'main':
     properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
     processed_lines = []
     for line in sys.stdin:
-        nucleotides_list = parse_line(line)
+        nucleotides_list, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(nucleotides_list, properties_df)
+        statistics_dict = count_statistics(sequence)
