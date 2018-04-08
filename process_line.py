@@ -1,3 +1,4 @@
+# Developed by AlexShein 04.2018
 from collections import OrderedDict
 from functools import reduce
 from itertools import product
@@ -112,13 +113,47 @@ def count_statistics(sequence):
     """
     returns dict
     """
-    pass
+    statistics_dict = OrderedDict()
+    for dinucleotide in DINUCLEOTIDES:
+        statistics_dict[dinucleotide] = sequence.count(dinucleotide)
+    for trinucleotide in TRINUCLEOTIDES:
+        statistics_dict[trinucleotide] = sequence.count(trinucleotide)
+    statistics_dict['GC precentage'] = (sequence.count('G') + sequence.count('C')) * 100 / len(sequence)
+    return statistics_dict
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(
+        description='Process lines of *.pal files to store data.',
+        usage='cat *.pal | python3 process_line.py -output_file 123.csv -target 1',
+    )
+    parser.add_argument(
+        '-output_file',
+        dest='output_file',
+        help='Name of file to store results',
+        required=True,
+    )
+    parser.add_argument(
+        '-target',
+        dest='target',
+        type=bool,
+        help='Are the sequences target ones',
+        required=True,
+    )
+    args = parser.parse_args()
+
     properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
+
     processed_lines = []
     for line in sys.stdin:
         nucleotides_list, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(nucleotides_list, properties_df)
-        statistics_dict = count_statistics(sequence)
+        line_dict.update(count_statistics(sequence))
+        line_dict[IS_TARGET] = args.target
+        processed_lines.append(line_dict)
+
+    result_df = pd.DataFrame(processed_lines)
+    result_df.to_csv(args.output_file, sep=';')
+
+    sys.exit(0)
