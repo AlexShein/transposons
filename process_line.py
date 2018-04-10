@@ -111,7 +111,7 @@ def get_dinucleotides_properties_dict(nucleotides_list, properties_df):
 
 def count_statistics(sequence):
     """
-    returns dict
+    returns dict of statistical features like [(('CCT', 0), ('CCG', 0), ('CCC', 0), ('GC precentage', 20.58)]
     """
     statistics_dict = OrderedDict()
     for dinucleotide in DINUCLEOTIDES:
