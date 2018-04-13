@@ -7,7 +7,6 @@ import argparse
 import pandas as pd
 import sys
 
-
 LS = ('LS0', 'LS1', 'LS2', 'LS3', 'LS4', 'LS5', 'LS6', 'LS7', 'LS8', 'LS9')
 RS = ('RS0', 'RS1', 'RS2', 'RS3', 'RS4', 'RS5', 'RS6', 'RS7', 'RS8', 'RS9')
 LOOP = ('LP0', 'LP1', 'LP2', 'LP3', 'LP4', 'LP5', 'LP6', 'LP7', 'LP8', 'LP9')
@@ -85,19 +84,27 @@ def parse_line(line):
     rs = splitted_line[5].upper()[:10]
     loop = splitted_line[6]
     return (
-        list(zip(LS[:len(ls)], ls)) + list(zip(RS[:len(rs)], rs)) + list(zip(LOOP[:len(loop)], loop)),
+        list(zip(LS[len(ls)::-1], ls)),
+        list(zip(LOOP[:len(loop)], loop)),
+        list(zip(RS[:len(rs)], rs)),
         ls + loop + rs,
     )
 
 
-def get_dinucleotides_properties_dict(nucleotides_list, properties_df):
+def get_dinucleotides_properties_dict(ls, lp, rs, properties_df):
     """
-    Recieves list of pairs [('LS0', 'T'), ('LS1', 'A'), ('LS2', 'T'),...]
+    Recieves lists of pairs [('LS0', 'T'), ('LS1', 'A'), ('LS2', 'T'),...]
     Returns ordered dict with items like
     [('LS0LS1 - Shift (RNA)', -0.02), ('LS0LS1 - Slide (RNA)', -1.45), ...]
     """
     line_dict = OrderedDict()
-    for pair in get_pairs(nucleotides_list):
+    boarders = [
+        (('LS', ls[-1][1]), ('LP', lp[0][1])),
+        (('LP', lp[-1][1]), ('RS', rs[0][1]))
+    ]
+    pairs = reduce(add, map(get_pairs, (ls, lp, rs))) + boarders
+
+    for pair in pairs:
         dinucleotide = pair[0][1] + pair[1][1]
         position = pair[0][0] + pair[1][0]
         if pair[0][1] == '_' or pair[1][1] == '_':
@@ -122,6 +129,21 @@ def count_statistics(sequence):
     return statistics_dict
 
 
+def process_lines(lines, is_target):
+    """
+    returns list of dicts
+    """
+    properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
+    processed_lines = []
+    for line in lines:
+        ls, lp, rs, sequence = parse_line(line)
+        line_dict = get_dinucleotides_properties_dict(ls, lp, rs, properties_df)
+        line_dict.update(count_statistics(sequence))
+        line_dict[IS_TARGET] = is_target
+        processed_lines.append(line_dict)
+    return processed_lines
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -143,15 +165,16 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
+    # properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
 
-    processed_lines = []
-    for line in sys.stdin:
-        nucleotides_list, sequence = parse_line(line)
-        line_dict = get_dinucleotides_properties_dict(nucleotides_list, properties_df)
-        line_dict.update(count_statistics(sequence))
-        line_dict[IS_TARGET] = args.target
-        processed_lines.append(line_dict)
+    # processed_lines = []
+    # for line in sys.stdin:
+    #     nucleotides_list, sequence = parse_line(line)
+    #     line_dict = get_dinucleotides_properties_dict(nucleotides_list, properties_df)
+    #     line_dict.update(count_statistics(sequence))
+    #     line_dict[IS_TARGET] = args.target
+    #     processed_lines.append(line_dict)
+    processed_lines = process_lines(sys.stdin, args.target)
 
     result_df = pd.DataFrame(processed_lines)
     result_df.to_csv(args.output_file, sep=';')
