@@ -129,7 +129,7 @@ def count_statistics(sequence):
     return statistics_dict
 
 
-def process_lines(lines, is_target):
+def process_lines(lines, is_target=True):
     """
     returns list of dicts
     """
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     #     line_dict.update(count_statistics(sequence))
     #     line_dict[IS_TARGET] = args.target
     #     processed_lines.append(line_dict)
-    processed_lines = process_lines(sys.stdin, args.target)
+    processed_lines = process_lines(sys.stdin, is_target=args.target)
 
     result_df = pd.DataFrame(processed_lines)
     result_df.to_csv(args.output_file, sep=';')
