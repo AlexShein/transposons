@@ -33,6 +33,7 @@ PROPERTIES = (
 STATISTICS = ('GC precentage',)
 IS_TARGET = 'is_target'
 
+NUCLEOTIDES = 'AGTC'
 DINUCLEOTIDES = [
     'AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 'GA', 'GT', 'GG', 'GC', 'CA', 'CT', 'CG', 'CC'
 ]
@@ -79,7 +80,7 @@ def parse_line(line):
     Returns a list with left and rights parts of stem and loop and ther indexing.
     [('LS0', 'T'), ('LS1', 'A'), ('LS2', 'T'),...]
     """
-    splitted_line = list(filter(bool, line.split(' ')))
+    splitted_line = list(filter(bool, line.split('\t')))
     ls = splitted_line[4][::-1].upper()[:10]
     rs = splitted_line[5].upper()[:10]
     loop = splitted_line[6]
@@ -97,7 +98,7 @@ def get_dinucleotides_properties_dict(ls, lp, rs, properties_df):
     Returns ordered dict with items like
     [('LS0LS1 - Shift (RNA)', -0.02), ('LS0LS1 - Slide (RNA)', -1.45), ...]
     """
-    line_dict = OrderedDict()
+    line_dict = OrderedDict(is_target=False)
     boarders = [
         (('LS', ls[-1][1]), ('LP', lp[0][1])),
         (('LP', lp[-1][1]), ('RS', rs[0][1]))
@@ -107,7 +108,7 @@ def get_dinucleotides_properties_dict(ls, lp, rs, properties_df):
     for pair in pairs:
         dinucleotide = pair[0][1] + pair[1][1]
         position = pair[0][0] + pair[1][0]
-        if pair[0][1] == '_' or pair[1][1] == '_':
+        if pair[0][1] not in NUCLEOTIDES or pair[1][1] not in NUCLEOTIDES:
             prop_values = {prop: 0 for prop in PROPERTIES}
         else:
             prop_values = properties_df[properties_df['Dinucleotide'] == dinucleotide]
@@ -129,13 +130,13 @@ def count_statistics(sequence):
     return statistics_dict
 
 
-def process_lines(lines, is_target):
+def process_lines(lines):
     """
     returns list of dicts
     """
     properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
     processed_lines = []
-    for line in lines:
+    for line, is_target in lines:
         ls, lp, rs, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(ls, lp, rs, properties_df)
         line_dict.update(count_statistics(sequence))
@@ -174,7 +175,9 @@ if __name__ == '__main__':
     #     line_dict.update(count_statistics(sequence))
     #     line_dict[IS_TARGET] = args.target
     #     processed_lines.append(line_dict)
-    processed_lines = process_lines(sys.stdin, args.target)
+    lines = list(sys.stdin)
+    data_to_process = zip(lines, [args.target]*len(lines))
+    processed_lines = process_lines(data_to_process)
 
     result_df = pd.DataFrame(processed_lines)
     result_df.to_csv(args.output_file, sep=';')
