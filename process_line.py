@@ -33,6 +33,7 @@ PROPERTIES = (
 STATISTICS = ('GC precentage',)
 IS_TARGET = 'is_target'
 
+NUCLEOTIDES = 'AGTC'
 DINUCLEOTIDES = [
     'AA', 'AT', 'AG', 'AC', 'TA', 'TT', 'TG', 'TC', 'GA', 'GT', 'GG', 'GC', 'CA', 'CT', 'CG', 'CC'
 ]
@@ -79,7 +80,7 @@ def parse_line(line):
     Returns a list with left and rights parts of stem and loop and ther indexing.
     [('LS0', 'T'), ('LS1', 'A'), ('LS2', 'T'),...]
     """
-    splitted_line = list(filter(bool, line.split(' ')))
+    splitted_line = list(filter(bool, line.split('\t')))
     ls = splitted_line[4][::-1].upper()[:10]
     rs = splitted_line[5].upper()[:10]
     loop = splitted_line[6]
@@ -107,7 +108,7 @@ def get_dinucleotides_properties_dict(ls, lp, rs, properties_df):
     for pair in pairs:
         dinucleotide = pair[0][1] + pair[1][1]
         position = pair[0][0] + pair[1][0]
-        if pair[0][1] == '_' or pair[1][1] == '_':
+        if pair[0][1] not in NUCLEOTIDES or pair[1][1] not in NUCLEOTIDES:
             prop_values = {prop: 0 for prop in PROPERTIES}
         else:
             prop_values = properties_df[properties_df['Dinucleotide'] == dinucleotide]

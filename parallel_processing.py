@@ -3,8 +3,13 @@ from process_line import process_lines
 import argparse
 import os
 import pandas as pd
+import logging
 
 STREAMS = cpu_count()
+
+log = logging.getLogger('parallel_processing.py')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
 
 
 def get_chunks(lst, chunk_size):
@@ -17,22 +22,27 @@ def get_chunks(lst, chunk_size):
 def get_last_line(filename):
     with open(filename, 'r') as file:
         lines = file.readlines()
-        return lines[:-1]
+        return lines[-1]
 
 
 def begin_processing(path, output_file):
 
     results = []
     files = [filename for filename in os.listdir(path) if filename[-4:] == '.pal']
+    log.info("Got {0} files".format(len(files)))
     chunk_size = len(files) // STREAMS + 1
+    log.info("Processing with chunk_size = {0}".format(chunk_size))
     with Pool(processes=STREAMS) as pool:
         processed_data = pool.map(process_lines, get_chunks(
             list(map(get_last_line, files)), chunk_size)
         )
+    log.info("Processing finished")
     for chunk in processed_data:
         results += chunk
+    log.info("Creating df and writing to csv")
     result_df = pd.DataFrame(results)
     result_df.to_csv(output_file, sep=';')
+    log.info("Done!")
 
 
 if __name__ == '__main__':
@@ -53,9 +63,5 @@ if __name__ == '__main__':
         required=True,
     )
     args = parser.parse_args()
+    log.info("Started command with path = {0}, output_file = {1}".format(args.path, args.output_file))
     begin_processing(args.path, args.output_file)
-
-    # info('main line')
-    # p = Process(target=f, args=('bob',))
-    # p.start()
-    # p.join()
