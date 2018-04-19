@@ -37,7 +37,7 @@ def get_lines(filename):
 def begin_processing(path, output_file):
 
     results = []
-    files = [filename for filename in os.listdir(path) if filename[-4:] == '.pal']
+    files = [os.path.join(path, filename) for filename in os.listdir(path) if filename[-4:] == '.pal']
     log.info("Got {0} files".format(len(files)))
     chunk_size = len(files) // STREAMS + 1
     log.info("Processing with chunk_size = {0}".format(chunk_size))
