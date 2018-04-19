@@ -1,15 +1,18 @@
+from functools import reduce
 from multiprocessing import cpu_count, Pool
+from operator import add
 from process_line import process_lines
+from random import randint
 import argparse
+import logging
 import os
 import pandas as pd
-import logging
+
 
 STREAMS = cpu_count()
 
 log = logging.getLogger('parallel_processing.py')
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 
 
 def get_chunks(lst, chunk_size):
@@ -25,6 +28,12 @@ def get_last_line(filename):
         return lines[-1]
 
 
+def get_lines(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        return ((lines[-1], 1), (lines[randint(0, len(lines) - 1)], 0))
+
+
 def begin_processing(path, output_file):
 
     results = []
@@ -33,8 +42,8 @@ def begin_processing(path, output_file):
     chunk_size = len(files) // STREAMS + 1
     log.info("Processing with chunk_size = {0}".format(chunk_size))
     with Pool(processes=STREAMS) as pool:
-        processed_data = pool.map(process_lines, get_chunks(
-            list(map(get_last_line, files)), chunk_size)
+        processed_data = pool.map(
+            process_lines, get_chunks(reduce(add, map(get_lines, files)), chunk_size)
         )
     log.info("Processing finished")
     for chunk in processed_data:
@@ -47,8 +56,8 @@ def begin_processing(path, output_file):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Process lines of *.pal files to store data.',
-        usage='cat *.pal | python3 process_line.py -output_file 123.csv -target 1',
+        description='Process *.pal files to store statistics.',
+        usage='python3 parallel_processing.py -output_file 12345.csv -path ./',
     )
     parser.add_argument(
         '-output_file',
@@ -59,7 +68,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-path',
         dest='path',
-        help='Location with pal files',
+        help='Location of .pal files',
         required=True,
     )
     args = parser.parse_args()

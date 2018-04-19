@@ -98,7 +98,7 @@ def get_dinucleotides_properties_dict(ls, lp, rs, properties_df):
     Returns ordered dict with items like
     [('LS0LS1 - Shift (RNA)', -0.02), ('LS0LS1 - Slide (RNA)', -1.45), ...]
     """
-    line_dict = OrderedDict()
+    line_dict = OrderedDict(is_target=False)
     boarders = [
         (('LS', ls[-1][1]), ('LP', lp[0][1])),
         (('LP', lp[-1][1]), ('RS', rs[0][1]))
@@ -130,13 +130,13 @@ def count_statistics(sequence):
     return statistics_dict
 
 
-def process_lines(lines, is_target=True):
+def process_lines(lines):
     """
     returns list of dicts
     """
     properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
     processed_lines = []
-    for line in lines:
+    for line, is_target in lines:
         ls, lp, rs, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(ls, lp, rs, properties_df)
         line_dict.update(count_statistics(sequence))
@@ -175,7 +175,9 @@ if __name__ == '__main__':
     #     line_dict.update(count_statistics(sequence))
     #     line_dict[IS_TARGET] = args.target
     #     processed_lines.append(line_dict)
-    processed_lines = process_lines(sys.stdin, is_target=args.target)
+    lines = list(sys.stdin)
+    data_to_process = zip(lines, [args.target]*len(lines))
+    processed_lines = process_lines(data_to_process)
 
     result_df = pd.DataFrame(processed_lines)
     result_df.to_csv(args.output_file, sep=';')
