@@ -1,9 +1,12 @@
 # Developed by AlexShein 04.2018
 from collections import OrderedDict
+from datetime import datetime as dt
 from functools import reduce
 from itertools import product
 from operator import add
 import argparse
+import logging
+import os
 import pandas as pd
 import sys
 
@@ -134,6 +137,12 @@ def process_lines(lines):
     """
     returns list of dicts
     """
+    log = logging.getLogger(__name__ + '-' + str(os.getpid()))
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    log.info("Started new worker")
+    start = dt.utcnow()
+
     properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
     processed_lines = []
     for line, is_target in lines:
@@ -142,6 +151,12 @@ def process_lines(lines):
         line_dict.update(count_statistics(sequence))
         line_dict[IS_TARGET] = is_target
         processed_lines.append(line_dict)
+    end = dt.utcnow()
+
+    log.info("Job finished, execution time {0}".format(
+        str((end - start).seconds) + '.' + str((end - start).microseconds),
+    ))
+
     return processed_lines
 
 
@@ -176,7 +191,7 @@ if __name__ == '__main__':
     #     line_dict[IS_TARGET] = args.target
     #     processed_lines.append(line_dict)
     lines = list(sys.stdin)
-    data_to_process = zip(lines, [args.target]*len(lines))
+    data_to_process = zip(lines, [args.target] * len(lines))
     processed_lines = process_lines(data_to_process)
 
     result_df = pd.DataFrame(processed_lines)
