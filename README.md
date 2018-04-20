@@ -3,7 +3,7 @@ Bioinformatics project
 # Description:
 DiPropreties.csv - csv with physical dinucleotides properties
 DiPropretiesT.csv - the same file
-process_line.py - conrains logic of .pal file's line processing - creates dict with each position dinucleotide's properties and some statistics.
+process_line.py - logic of .pal file's line processing - creates dict with each position dinucleotide's properties and some statistics.
 ```bash
 cat temp | python3 process_line.py -output_file 123.csv -target 1
 ```
