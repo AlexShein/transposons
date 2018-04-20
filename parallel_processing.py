@@ -82,5 +82,5 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     log.info("Started command, pid {0}"
-             "path {1}, output_file {2}".format(os.getppid(), args.path, args.output_file))
+             "path {1}, output_file {2}".format(os.getpid(), args.path, args.output_file))
     begin_processing(args.path, args.output_file)
