@@ -181,15 +181,6 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
 
-    # properties_df = pd.read_csv('DiPropretiesT.csv', sep=';')
-
-    # processed_lines = []
-    # for line in sys.stdin:
-    #     nucleotides_list, sequence = parse_line(line)
-    #     line_dict = get_dinucleotides_properties_dict(nucleotides_list, properties_df)
-    #     line_dict.update(count_statistics(sequence))
-    #     line_dict[IS_TARGET] = args.target
-    #     processed_lines.append(line_dict)
     lines = list(sys.stdin)
     data_to_process = zip(lines, [args.target] * len(lines))
     processed_lines = process_lines(data_to_process)
