@@ -58,7 +58,7 @@ def begin_processing(path, output_file):
     result_df = pd.DataFrame(results)
 
     # Filling of NaN values needed
-    result_df.fillna(value=0.0)
+    result_df = result_df.fillna(value=0.0)
 
     result_df.to_csv(output_file, sep=';')
     end = dt.utcnow()
