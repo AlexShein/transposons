@@ -37,7 +37,10 @@ def get_lines(filename):
     """
     with open(filename, 'r') as file:
         lines = file.readlines()
-        return ((lines[-1], 1), (lines[randint(0, len(lines) - 1)], 0))
+        if lines:
+            return ((lines[-1], 1), (lines[randint(0, len(lines) - 1)], 0))
+        else:
+            return ()
 
 
 def begin_processing(path, output_file):
