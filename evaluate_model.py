@@ -24,16 +24,16 @@ def evaluate_model(df):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Applies RandomForestClassifier to dataset',
-        usage='python3 evaluate_model.py -dataset_csv ./ml_dataset.csv',
+        usage='python3 evaluate_model.py -dataset ./ml_dataset.csv',
     )
     parser.add_argument(
-        '-dataset_csv',
-        dest='dataset_csv',
+        '-dataset',
+        dest='dataset',
         help='Name of data set file',
         required=True,
     )
     args = parser.parse_args()
-    df = pd.read_csv(args.dataset_csv, sep=';')
+    df = pd.read_csv(args.dataset, sep=';')
     df = df[[i for i in list(df.columns) if i not in ('Unnamed: 0')]]
     df = df.fillna(value=0.0)
     start = time()
