@@ -19,6 +19,7 @@ def evaluate_model(df):
         score = rf.score(dfX.iloc[test], dfY.iloc[test])
         scores.append(score)
         print('[fold {0}], score: {1:.3f}'.format(k, score))
+    print('Mean: {0:.3f}'.format(sum(scores)/len(scores)))
 
 
 if __name__ == '__main__':
