@@ -1,14 +1,17 @@
 # Developed by AlexShein 04.2018
-from datetime import datetime as dt
-from functools import reduce
-from multiprocessing import cpu_count, Pool
-from operator import add
-from process_line import process_lines
-from random import randint
 import argparse
 import logging
 import os
+from datetime import datetime as dt
+from functools import reduce
+from multiprocessing import Pool, cpu_count
+from multiprocessing.dummy import Pool as d_Pool
+from operator import add
+from random import randint
+
 import pandas as pd
+
+from process_line import process_lines
 
 STREAMS = cpu_count()
 
@@ -26,7 +29,17 @@ def get_chunks(lst, chunk_size):
 def get_last_line(filename):
     with open(filename, 'r') as file:
         lines = file.readlines()
-        return lines[-1]
+        if lines:
+            return ((lines[-1], 1),)
+    return ()
+
+
+def get_random_line(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+        if lines:
+            return ((lines[randint(0, len(lines) - 1)], 0),)
+    return ()
 
 
 def get_lines(filename):
@@ -43,16 +56,47 @@ def get_lines(filename):
             return ()
 
 
-def begin_processing(path, output_file):
+def begin_processing(t_path, nt_path=None, output_file='sl_annotation_result.csv'):
     start = dt.utcnow()
     results = []
-    files = [os.path.join(path, filename) for filename in os.listdir(path) if filename[-4:] == '.pal']
-    log.info("Got {0} files".format(len(files)))
-    chunk_size = len(files) // STREAMS + 1
+    if nt_path:
+        # Processing both target and non-target files
+        target_files = [
+            os.path.join(
+                t_path, filename
+            ) for filename in os.listdir(t_path) if filename[-4:] == '.pal'
+        ]
+        non_target_files = [
+            os.path.join(
+                nt_path, filename
+            ) for filename in os.listdir(nt_path) if filename[-4:] == '.pal'
+        ]
+
+        log.info("Got {0} files".format(len(target_files) + len(non_target_files)))
+        # Using dummy because threading is good for io-bound operations
+        with d_Pool() as d_pool:
+            data_to_process = reduce(add, d_pool.map(get_last_line, target_files))
+            data_to_process += reduce(add, d_pool.map(get_random_line, non_target_files))
+        chunk_size = (len(target_files) + len(non_target_files)) // STREAMS + 1
+
+    else:
+        # processing target files only
+        files = [
+            os.path.join(
+                t_path, filename
+            ) for filename in os.listdir(t_path) if filename[-4:] == '.pal'
+        ]
+
+        log.info("Got {0} files".format(len(files)))
+        # Using dummy because threading is good for io-bound operations
+        with d_Pool() as d_pool:
+            data_to_process = reduce(add, d_pool.map(get_lines, files))
+        chunk_size = len(files) // STREAMS + 1
+
     log.info("Processing with chunk_size = {0}. Starting {1} workers".format(chunk_size, STREAMS))
     with Pool(processes=STREAMS) as pool:
         processed_data = pool.map(
-            process_lines, get_chunks(reduce(add, map(get_lines, files)), chunk_size)
+            process_lines, get_chunks(data_to_process, chunk_size)
         )
     log.info("Combining results into single dict")
     for chunk in processed_data:
@@ -73,7 +117,7 @@ def begin_processing(path, output_file):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Process *.pal files to store statistics.',
-        usage='python3 parallel_processing.py -output_file 12345.csv -path ./',
+        usage='python3 parallel_processing.py -output_file 12345.csv -t_path ./temp_pal -nt_path ./temp_pal',
     )
     parser.add_argument(
         '-output_file',
@@ -82,12 +126,24 @@ if __name__ == '__main__':
         required=True,
     )
     parser.add_argument(
-        '-path',
-        dest='path',
-        help='Location of .pal files',
+        '-t_path',
+        dest='t_path',
+        help='Location of target .pal files',
         required=True,
     )
+    parser.add_argument(
+        '-nt_path',
+        dest='nt_path',
+        help='Location of non-target .pal files',
+        required=False,
+        default='',
+    )
     args = parser.parse_args()
-    log.info("Started command, pid {0}, "
-             "path {1}, output_file {2}".format(os.getpid(), args.path, args.output_file))
-    begin_processing(args.path, args.output_file)
+    log.info("Started command, pid {0}, output_file {1}, path {2}, nt_path {3}".format(
+        os.getpid(), args.output_file, args.t_path, args.nt_path,
+    ))
+    begin_processing(
+        args.t_path,
+        nt_path=args.nt_path,
+        output_file=args.output_file,
+    )
