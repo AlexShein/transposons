@@ -10,8 +10,10 @@ cat temp | python3 process_line.py -output_file 123.csv -target 1
 ```
 ### parallel_processing.py
 This is a script that processes all .pal files located at provided path and places results into csv file.
+-t_path for target files path and -nt_path for non-target ones.
 ```bash
-python3 parallel_processing.py -path /home/dariag/RepBase_embl/ALL_LINE2/res_S15-30_L0-10_M5 -output_file test.csv
+python3 parallel_processing.py -output_file output.csv -t_path /home/dariag/RepBase_embl/ALL_LINE2/res_S15-30_L0-10_M5 \
+-nt_path /home/dariag/RepBase_embl/ALL_LINE2/temp
 ```
 ### params_optimization.py
 Prints optimal params for RandomForestClassifier
