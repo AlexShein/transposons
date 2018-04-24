@@ -117,7 +117,7 @@ def begin_processing(t_path, nt_path=None, output_file='sl_annotation_result.csv
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Process *.pal files to store statistics.',
-        usage='python3 parallel_processing.py -output_file 12345.csv -path ./',
+        usage='python3 parallel_processing.py -output_file 12345.csv -t_path ./temp_pal -nt_path ./temp_pal',
     )
     parser.add_argument(
         '-output_file',
