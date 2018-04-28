@@ -26,7 +26,8 @@ Print share of classifier's hits
 ```bash
 python3 evaluate_model.py -dataset ./ml_dataset.csv
 ```
-### get_random_lines.sh extracts n random lines and writes them into a file
+### get_random_lines.sh
+Extracts totally n random lines and writes them into a file
 ```bash
-./get_random_lines.sh ./temp_pal/ 1 1234.pal
+./get_random_lines.sh /home/shared/STEMLOOPS/hg19/S15-30_L0-10_M5/ 2200 S15-30_L0-10_M5_rand_non-target_hg19_2200.pal
 ```
