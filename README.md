@@ -31,3 +31,8 @@ Extracts totally n random lines and writes them into a file
 ```bash
 ./get_random_lines.sh /home/shared/STEMLOOPS/hg19/S15-30_L0-10_M5/ 2200 S15-30_L0-10_M5_rand_non-target_hg19_2200.pal
 ```
+### merge_dataframes.py
+Merges .csv files into a single one
+```bash
+python3 ./merge_dataframes.py -output_file merged.csv -files 12345.csv,123456.csv
+```
