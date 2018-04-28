@@ -36,3 +36,8 @@ Merges .csv files into a single one
 ```bash
 python3 ./merge_dataframes.py -output_file merged.csv -files 12345.csv,123456.csv
 ```
+### File shuffling
+```bash
+head -n1 ../processed_28_04/merged_S15-30_L0-10_M5_4400.csv >> ../processed_28_04/merged_S15-30_L0-10_M5_4400_shuffled.csv
+tail -n4320 ../processed_28_04/merged_S15-30_L0-10_M5_4400.csv | shuf >> ../processed_28_04/merged_S15-30_L0-10_M5_4400_shuffled.csv
+```
