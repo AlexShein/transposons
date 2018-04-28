@@ -3,7 +3,7 @@ import argparse
 import logging
 import os
 from datetime import datetime as dt
-from functools import reduce
+from functools import partial, reduce
 from multiprocessing import Pool, cpu_count
 from multiprocessing.dummy import Pool as d_Pool
 from operator import add
@@ -42,12 +42,15 @@ def get_random_line(filename):
     return ()
 
 
-def get_lines(filename):
+def get_lines(filename, n=0):
+    result = ()
     with open(filename, 'r') as file:
-        lines = file.readlines()
-        if lines:
-            return tuple((line, 0) for line in lines if line)
-    return ()
+        if n:
+            # Little magic to get rid of empty lines
+            result = tuple(filter(lambda x: bool(x[0]), ((file.readline(), 0) for _ in range(n))))
+        else:
+            result = tuple((line, 0) for line in file if line)
+    return result
 
 
 def get_lines_test(filename):
@@ -64,9 +67,21 @@ def get_lines_test(filename):
             return ()
 
 
-def begin_processing(path, target, output_file='sl_annotation_result.csv', test_run=False):
+def begin_processing(
+    path,
+    target,
+    output_file='sl_annotation_result.csv',
+    test_run=False,
+    n_lines=0,
+):
     start = dt.utcnow()
     results = []
+    files = [
+        os.path.join(
+            path, filename
+        ) for filename in os.listdir(path) if filename[-4:] == '.pal'
+    ]
+    log.info("Got {0} files".format(len(files)))
     if test_run:
         line_retiever_func = get_lines_test
     elif target:
@@ -74,14 +89,11 @@ def begin_processing(path, target, output_file='sl_annotation_result.csv', test_
         line_retiever_func = get_last_line
     else:
         # processing non-target files only
-        line_retiever_func = get_lines
-    files = [
-        os.path.join(
-            path, filename
-        ) for filename in os.listdir(path) if filename[-4:] == '.pal'
-    ]
-
-    log.info("Got {0} files".format(len(files)))
+        if n_lines:
+            file_lines = n_lines // len(files) + 1
+        else:
+            file_lines = 0
+        line_retiever_func = partial(get_lines, n=file_lines)
 
     # Using dummy because threading is good for io-bound operations
     with d_Pool() as d_pool:
@@ -143,17 +155,25 @@ if __name__ == '__main__':
         '--test',
         dest='test',
         action='store_true',
-        help='Are those ones target',
+        help='Test mode',
         required=False,
         default=False,
     )
+    parser.add_argument(
+        '-n',
+        dest='n_lines',
+        help='Number of lines to process',
+        required=False,
+        default=0,
+    )
     args = parser.parse_args()
-    log.info("Started command, pid {0}, output_file {1}, path {2}, target {3}, test {4}".format(
-        os.getpid(), args.output_file, args.path, args.target, args.test,
+    log.info("Started command, pid {0}, output_file {1}, path {2}, target {3}, test {4}, n_lines {5}".format(
+        os.getpid(), args.output_file, args.path, args.target, args.test, args.n_lines
     ))
     begin_processing(
         args.path,
         args.target,
         output_file=args.output_file,
         test_run=args.test,
+        n_lines=int(args.n_lines),
     )
