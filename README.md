@@ -8,13 +8,13 @@ Logic of .pal file's line processing - creates dict with each position dinucleot
 ```bash
 cat temp | python3 process_line.py -output_file 123.csv -target 1
 ```
-### parallel_processing.py
-This is a script that processes all .pal files located at provided path and places results into csv file.
+### parallel_processing_v2.py
+This is a script that processes all .pal files located at provided path and places results into csv file. First version is deprecated
 -t_path for target files path and -nt_path for non-target ones.
 ```bash
-python3 parallel_processing.py -output_file output.csv \
--t_path /home/dariag/RepBase_embl/ALL_LINE2/res_S15-30_L0-10_M5 \
--nt_path /home/dariag/RepBase_embl/ALL_LINE2/temp
+python3 parallel_processing_v2.py -output_file output.csv \
+-path /home/dariag/RepBase_embl/ALL_LINE2/res_S15-30_L0-10_M5 \
+-n 1000
 ```
 ### params_optimization.py
 Prints optimal params for RandomForestClassifier
@@ -26,3 +26,4 @@ Print share of classifier's hits
 ```bash
 python3 evaluate_model.py -dataset ./ml_dataset.csv
 ```
+###
