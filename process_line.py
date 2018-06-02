@@ -102,11 +102,11 @@ def get_dinucleotides_properties_dict(ls, lp, rs, properties_df):
     [('LS0LS1 - Shift (RNA)', -0.02), ('LS0LS1 - Slide (RNA)', -1.45), ...]
     """
     line_dict = OrderedDict(is_target=False)
-    boarders = [
+    borders = [
         (('LS', ls[-1][1]), ('LP', lp[0][1])),
         (('LP', lp[-1][1]), ('RS', rs[0][1]))
     ]
-    pairs = reduce(add, map(get_pairs, (ls, lp, rs))) + boarders
+    pairs = reduce(add, map(get_pairs, (ls, lp, rs))) + borders
 
     for pair in pairs:
         dinucleotide = pair[0][1] + pair[1][1]
