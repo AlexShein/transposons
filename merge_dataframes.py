@@ -17,8 +17,8 @@ def merge_dataframes(files):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Process *.pal files to store statistics.',
-        usage='python3 parallel_processing_v2.py -output_file 123456.csv -path ./temp_pal',
+        description='Merge processed *.pal files.',
+        usage='python3 ./merge_dataframes.py -output_file merged.csv -files target.csv,non_target.csv',
     )
     parser.add_argument(
         '-output_file',
