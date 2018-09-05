@@ -41,3 +41,8 @@ python3 ./merge_dataframes.py -output_file merged.csv -files 12345.csv,123456.cs
 head -n1 ../processed_28_04/merged_S15-30_L0-10_M5_4400.csv >> ../processed_28_04/merged_S15-30_L0-10_M5_4400_shuffled.csv
 tail -n4320 ../processed_28_04/merged_S15-30_L0-10_M5_4400.csv | shuf >> ../processed_28_04/merged_S15-30_L0-10_M5_4400_shuffled.csv
 ```
+### Cutting last n bases of sequence
+Use `clean` argument to cut off poly-a tail
+```bash
+transposones/shell_scripts/cut_last_n_bases.sh /home/shared/L1-Alu/Alu/AluS/fasta ~/last_n_bps/AluS_50_bps_test.txt 50 clean
+```
