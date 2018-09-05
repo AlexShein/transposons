@@ -8,7 +8,6 @@ LEN=$(ls $1/*.fa|wc -l)
 COUNTER=1
 for filename in $(ls $1/*.fa); do
     tail -n$3 $filename >> "$2"
-    echo '' >> "$2"
     if [$COUNTER//10 -eq 0] then
         echo -ne "Processing $COUNTER out of $LEN"
     fi
