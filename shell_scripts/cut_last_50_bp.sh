@@ -7,11 +7,14 @@ echo "Writing to "$2
 LEN=$(ls $1/*.fa|wc -l)
 COUNTER=1
 for filename in $(ls $1/*.fa); do
-    tail -n$3 $filename >> "$2"
-    if [($COUNTER//10) -eq 0]
+    POLY_A_END=$(tail -n1 $filename | rev | grep -aob '[CTG]'| head -n1 | grep -oE '[0-9]+')
+    # Cut the sequence to the position of first non-A base from end
+    SEQ=$(tail -c $(($3+$POLY_A_END)) $filename)
+    echo $SEQ | cut -c1-$((${#SEQ}-$POLY_A_END)) >> "$2"
+    if (($(($COUNTER%200)) == 0))
     then
-        echo -ne "Processing $COUNTER out of $LEN"
+        echo -ne "\rProcessing $COUNTER out of $LEN"
     fi
     COUNTER=$[COUNTER + 1]
 done
-echo -ne '\n'
+echo -ne "\rDone, processed $LEN files\n"
