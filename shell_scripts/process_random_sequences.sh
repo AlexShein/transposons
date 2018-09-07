@@ -1,4 +1,5 @@
 #!/bin/bash
+# First arg: int - amount of files to process
 COUNTER=1
 LEN=$(ls $TPATH | wc -l)
 TPATH=/home/shared/L1-Alu/shuffle/fasta/
@@ -11,7 +12,7 @@ for filename in $(ls $TPATH | shuf); do
     fi
     if [[ COUNTER -eq $1 ]]
     then
-        echo -ne "\r#Done, processed $COUNTER files\n"
         break
     fi
 done;
+echo -ne "\r#Done, processed $COUNTER files\n"
