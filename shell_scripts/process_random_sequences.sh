@@ -14,5 +14,4 @@ for filename in $(ls $TPATH | shuf); do
         echo -ne "\r#Done, processed $COUNTER files\n"
         break
     fi
-    echo -ne "\r#Done, processed $COUNTER files\n"
 done;
