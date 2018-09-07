@@ -1,5 +1,6 @@
 #!/bin/bash
 COUNTER=1
+LEN=$(ls $TPATH | wc -l)
 TPATH=/home/shared/L1-Alu/shuffle/fasta/
 for filename in $(ls $TPATH | shuf); do
     tail -n1 $TPATH$filename >> /home/alexshein/last_n_bps/random_nt_seq.txt
