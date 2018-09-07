@@ -13,7 +13,7 @@ for filename in $(ls $1/*.fa); do
         POLY_A_END=$(tail -n1 $filename | rev | grep -aob '[CTG]\{2,\}' | head -n1 | grep -oE '[0-9]+')
         # Cut the sequence to the position of first non-A base from end
         SEQ=$(tail -c $(($3+1+$POLY_A_END)) $filename)
-        echo $SEQ | cut -c1-$((${#SEQ}-$POLY_A_END+1)) >> "$2"
+        echo $SEQ | cut -c1-$((${#SEQ}-$POLY_A_END)) >> "$2"
     else
         tail -c $3 $filename >> "$2"
     fi
