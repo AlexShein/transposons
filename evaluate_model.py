@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 
 def evaluate_model(df):
     rf = RandomForestClassifier(n_jobs=-1, n_estimators=200)
-    folded_data = model_selection.KFold(n_splits=5)
+    folded_data = model_selection.KFold(n_splits=10)
 
     dfX = df[[i for i in list(df.columns) if i not in ('is_target')]]
     dfY = df['is_target']
