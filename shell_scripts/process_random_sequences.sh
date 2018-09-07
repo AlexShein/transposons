@@ -9,9 +9,10 @@ for filename in $(ls $TPATH | shuf); do
     then
         echo -ne "\r#Processing $COUNTER out of $LEN"
     fi
-    if [[ COUNTER == 12000 ]]
+    if [[ COUNTER == $1 ]]
     then
         echo -ne "\r#Done, processed $COUNTER files\n"
         break
     fi
+    echo -ne "\r#Done, processed $COUNTER files\n"
 done;
