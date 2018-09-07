@@ -10,7 +10,7 @@ COUNTER=1
 for filename in $(ls $1/*.fa); do
     if [[ $4 == "clean" ]]
     then
-        POLY_A_END=$(tail -n1 $filename | rev | grep -aob '[CTG]'| head -n1 | grep -oE '[0-9]+')
+        POLY_A_END=$(tail -n1 $filename | rev | grep -aob '[CTG]'\{2,\} | head -n1 | grep -oE '[0-9]+')
         # Cut the sequence to the position of first non-A base from end
         SEQ=$(tail -c $(($3+$POLY_A_END)) $filename)
         echo $SEQ | cut -c1-$((${#SEQ}-$POLY_A_END)) >> "$2"
