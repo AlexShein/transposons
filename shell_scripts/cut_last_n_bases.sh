@@ -15,7 +15,7 @@ for filename in $(ls $1/*.fa); do
         SEQ=$(tail -c $(($3+1+$POLY_A_END)) $filename)
         echo $SEQ | cut -c1-$((${#SEQ}-$POLY_A_END)) >> "$2"
     else
-        tail -c $3 $filename >> "$2"
+        tail -c $3+1 $filename >> "$2"
     fi
     if (($(($COUNTER%200)) == 0))
     then
