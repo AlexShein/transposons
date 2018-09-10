@@ -1,12 +1,12 @@
-# Transposones
+# Transposons
 A bioinformatics project related to transposons recognition
 # Description:
-##Folders:
-###sequences
+## Folders:
+### sequences
 Contains raw sequences of both Alu and L1 + some random (no-transposon) pieces of genome
-###ipython
+### ipython
 Contains experiment notebooks
-##Files:
+## Files:
 DiPropreties.csv - csv with physical dinucleotides properties
 DiPropretiesT.csv - the same file
 ### process_line.py
