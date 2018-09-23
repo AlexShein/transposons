@@ -113,7 +113,7 @@ def begin_processing(
     for chunk in processed_data:
         results += chunk
 
-    log.info(f"Creating df and writing to {output_file}")
+    log.info("Creating df and writing to {0}".format(output_file))
     result_df = pd.DataFrame(results)
 
     # Filling of NaN values needed
