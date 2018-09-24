@@ -119,6 +119,17 @@ def count_statistics(sequence):
     return statistics_dict
 
 
+def get_loop_binary_features(name, loop):
+    res = {}
+    for i in loop:
+        for base in NUCLEOTIDES:
+            if loop[i] == base:
+                res[name + str(i) + base] = 1
+            else:
+                res[name + str(i) + base] = 0
+    return res
+
+
 def process_lines(lines):
     """
     returns list of dicts
@@ -130,10 +141,15 @@ def process_lines(lines):
     start = dt.utcnow()
 
     properties_df = pd.read_csv('DiPropretiesT.csv', sep=';', header=0)
+    NN_line = properties_df[
+        [col for col in properties_df.columns if col != 'Dinucleotide']
+    ].mean().rename(17)
+    NN_line.at['Dinucleotide'] = 'NN'
     properties_df = properties_df.append(
-        properties_df[
-            [col for col in properties_df.columns if col != 'Dinucleotide']
-        ].mean().set_value('Dinucleotide', 'NN').rename(17)
+        # properties_df[
+        #     [col for col in properties_df.columns if col != 'Dinucleotide']
+        # ].mean().set_value('Dinucleotide', 'NN').rename(17)
+        NN_line,
     )
     processed_lines = []
     for line, is_target in lines:
@@ -145,6 +161,9 @@ def process_lines(lines):
             RS, 'RS', properties_df
         ))
         line_dict.update(count_statistics(sequence))
+        line_dict.update(get_loop_binary_features('LP', LP))
+        line_dict.update(get_loop_binary_features('LB', LB))
+        line_dict.update(get_loop_binary_features('RB', RB))
         line_dict[IS_TARGET] = is_target
         processed_lines.append(line_dict)
     end = dt.utcnow()
