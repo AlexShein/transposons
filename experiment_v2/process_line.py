@@ -1,11 +1,12 @@
 # Developed by AlexShein 04.2018
 # Refactored 09.2018
-from datetime import datetime as dt
 import argparse
 import logging
 import os
-import pandas as pd
 import sys
+from datetime import datetime as dt
+
+import pandas as pd
 
 LS = ('LS0', 'LS1', 'LS2', 'LS3', 'LS4', 'LS5', 'LS6', 'LS7', 'LS8', 'LS9')
 RS = ('RS0', 'RS1', 'RS2', 'RS3', 'RS4', 'RS5', 'RS6', 'RS7', 'RS8', 'RS9')
@@ -146,9 +147,6 @@ def process_lines(lines):
     ].mean().rename(17)
     NN_line.at['Dinucleotide'] = 'NN'
     properties_df = properties_df.append(
-        # properties_df[
-        #     [col for col in properties_df.columns if col != 'Dinucleotide']
-        # ].mean().set_value('Dinucleotide', 'NN').rename(17)
         NN_line,
     )
     processed_lines = []
