@@ -166,8 +166,8 @@ def process_lines(lines):
         processed_lines.append(line_dict)
     end = dt.utcnow()
 
-    log.info("Job finished, execution time {0}".format(
-        str((end - start).seconds) + '.' + str((end - start).microseconds),
+    log.info("Job finished, execution time {}.{} seconds".format(
+        str((end - start).seconds), str((end - start).microseconds)[:2],
     ))
 
     return processed_lines

@@ -91,6 +91,7 @@ def begin_processing(
         # processing non-target files only
         if n_lines:
             file_lines = n_lines // len(files) + 1
+            # TODO allow file skiping to deal with situations when there are more files, than n_lines
         else:
             file_lines = 0
         line_retiever_func = partial(get_lines, n=file_lines)
@@ -121,8 +122,8 @@ def begin_processing(
 
     result_df.to_csv(output_file, sep=';')
     end = dt.utcnow()
-    log.info("Done! Execution time {0}".format(
-        str((end - start).seconds) + '.' + str((end - start).microseconds),
+    log.info("Done! Execution time {}.{} seconds".format(
+        str((end - start).seconds), str((end - start).microseconds)[:2],
     ))
 
 
