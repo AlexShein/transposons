@@ -39,6 +39,7 @@ if __name__ == '__main__':
         args.files,
     )
     if result_df is not None:
+        result_df = result_df.drop('Unnamed: 0')
         log.info("Writing to file")
         result_df.to_csv(args.output_file, sep=';')
         log.info("Done")
