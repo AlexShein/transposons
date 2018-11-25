@@ -149,7 +149,7 @@ def process_lines(lines):
         NN_line,
     )
     processed_lines = []
-    for line in lines:
+    for line in filter(lambda x: len(x.split('\t')) >= 7, lines):
         LS, RS, LB, RB, LP, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(
             LS, 'LS', properties_df
