@@ -130,6 +130,8 @@ def begin_processing(
         str((end - start).seconds), str((end - start).microseconds)[:2],
     ))
 
+    return result_df
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
