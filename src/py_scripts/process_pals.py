@@ -11,7 +11,7 @@ from operator import add
 import numpy as np
 import pandas as pd
 
-from process_line import process_lines
+from .process_line import process_lines
 
 STREAMS = cpu_count()
 
@@ -159,21 +159,21 @@ if __name__ == '__main__':
     parser.add_argument(
         '-n',
         dest='n_lines',
-        help='Number of lines to process',
+        help='Number of lines to process (per file)',
         required=False,
         default=0,
     )
     parser.add_argument(
         '-lines',
         dest='lines',
-        help='Location of target .pal files',
+        help='Which lines to fetch',
         required=True,
         choices=['first', 'last', 'rand']
     )
     parser.add_argument(
         '-o',
         dest='omit',
-        help='Which lines to omit, f[irst],l[ast]',
+        help='Which lines to omit, f[irst],l[ast]. Only for "-lines rand"',
         required=False,
         default='',
     )

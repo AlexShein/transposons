@@ -141,7 +141,7 @@ def process_lines(lines):
     log.info("Started new worker")
     start = dt.utcnow()
 
-    properties_df = pd.read_csv('DiPropretiesT.csv', sep=';', header=0)
+    properties_df = pd.read_csv('data/DiProDb.table/DiPropretiesT.csv', sep=';', header=0)
     NN_line = properties_df[
         [col for col in properties_df.columns if col != 'Dinucleotide']
     ].mean().rename(17)
