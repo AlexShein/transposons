@@ -26,23 +26,21 @@ def get_chunks(lst, chunk_size):
         yield lst[i:m]
 
 
-def get_last_line(filename, target):
+def get_last_line(filename):
     with open(filename, 'r') as file:
         lines = file.readlines()
-        return lines and lines[-1] and ((lines[-1], target),) or ()
+        return lines and [lines[-1]] or []
 
 
-def get_first_line(filename, target):
+def get_first_line(filename):
     with open(filename, 'r') as file:
         line = file.readline()
-        return line and ((line, target),) or ()
+        return [line] or []
 
 
-def get_random_lines(filename, target=0, n_lines=0, omit_first=False, omit_last=False):
+def get_random_lines(filename, n_lines=0, omit_first=False, omit_last=False):
     """
-    returns tuple of pairs like (line, 0/1), where 0/1 shows whether this sequence is target one or not
-    Target one is in last line of file
-    Non-target one is a random line of file
+    return lines
     """
     with open(filename, 'r') as file:
         lines = [line for line in filter(bool, file.readlines())]
@@ -52,15 +50,13 @@ def get_random_lines(filename, target=0, n_lines=0, omit_first=False, omit_last=
             if omit_last:
                 lines = lines[:-1]
             if n_lines and n_lines <= len(lines):
-                return [(line, target) for line in np.random.choice(lines, size=n_lines, replace=False)]
+                return [line for line in np.random.choice(lines, size=n_lines, replace=False)]
             else:
-                return [(line, target) for line in lines]
-    return ()
+                return lines
 
 
 def begin_processing(
     path,
-    target,
     lines,
     omit,
     output_file='sl_annotation_result.csv',
@@ -87,13 +83,12 @@ def begin_processing(
     omit_first = 'f' in omit
 
     if lines == 'first':
-        line_retiever_func = partial(get_first_line, target=target)
+        line_retiever_func = partial(get_first_line)
     elif lines == 'last':
-        line_retiever_func = partial(get_last_line, target=target)
+        line_retiever_func = partial(get_last_line)
     elif lines == 'rand':
         line_retiever_func = partial(
             get_random_lines,
-            target=target,
             n_lines=file_lines,
             omit_first=omit_first,
             omit_last=omit_last,
@@ -138,7 +133,7 @@ def begin_processing(
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Process *.pal files to store statistics.',
-        usage='python3 process_pals.py -output_file 123456.csv -path ./temp_pal -lines rand -o f,l --target',
+        usage='python3 process_pals.py -output_file 123456.csv -path ./temp_pal -lines rand -o f,l',
     )
     parser.add_argument(
         '-output_file',
@@ -151,14 +146,6 @@ if __name__ == '__main__':
         dest='path',
         help='Location of target .pal files',
         required=True,
-    )
-    parser.add_argument(
-        '--target',
-        dest='target',
-        action='store_true',
-        help='Are those ones target',
-        required=False,
-        default=False,
     )
     parser.add_argument(
         '-n',
@@ -182,12 +169,11 @@ if __name__ == '__main__':
         default='',
     )
     args = parser.parse_args()
-    log.info("Started command, pid {0}, output_file {1}, path {2}, target {3}, n_lines {4}, omit {5}".format(
-        os.getpid(), args.output_file, args.path, args.target, args.n_lines, args.omit
+    log.info("Started command, pid {0}, output_file {1}, path {2}, n_lines {3}, omit {4}".format(
+        os.getpid(), args.output_file, args.path, args.n_lines, args.omit
     ))
     begin_processing(
         args.path,
-        int(args.target),
         args.lines,
         args.omit.split(','),
         output_file=args.output_file,
