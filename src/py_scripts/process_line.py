@@ -23,7 +23,6 @@ PROPERTIES = (
     'Entropy (RNA)',
     'Free energy (RNA)',
 )
-IS_TARGET = 'is_target'
 
 NUCLEOTIDES = 'AGTC'
 DINUCLEOTIDES = [
@@ -150,7 +149,7 @@ def process_lines(lines):
         NN_line,
     )
     processed_lines = []
-    for line, is_target in lines:
+    for line in lines:
         LS, RS, LB, RB, LP, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(
             LS, 'LS', properties_df
@@ -162,7 +161,6 @@ def process_lines(lines):
         line_dict.update(get_loop_binary_features('LP', LP))
         line_dict.update(get_loop_binary_features('LB', LB))
         line_dict.update(get_loop_binary_features('RB', RB))
-        line_dict[IS_TARGET] = is_target
         processed_lines.append(line_dict)
     end = dt.utcnow()
 
@@ -177,7 +175,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='Process lines of *.pal files to store data.',
-        usage='cat *.pal | python3 process_line.py -output_file 123.csv -target 1',
+        usage='cat *.pal | python3 process_line.py -output_file 123.csv',
     )
     parser.add_argument(
         '-output_file',
@@ -185,17 +183,9 @@ if __name__ == '__main__':
         help='Name of file to store results',
         required=True,
     )
-    parser.add_argument(
-        '-target',
-        dest='target',
-        type=bool,
-        help='Are the sequences target ones',
-        required=True,
-    )
     args = parser.parse_args()
 
-    lines = list(sys.stdin)
-    data_to_process = zip(lines, [args.target] * len(lines))
+    data_to_process = list(sys.stdin)
     processed_lines = process_lines(data_to_process)
 
     result_df = pd.DataFrame(processed_lines)
