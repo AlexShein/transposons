@@ -65,6 +65,7 @@ def begin_processing(
     omit,
     output_file='sl_annotation_result.csv',
     n_lines=0,
+    write_to_csv=True,
 ):
     start = dt.utcnow()
     results = []
@@ -118,13 +119,14 @@ def begin_processing(
     for chunk in processed_data:
         results += chunk
 
-    log.info("Creating df and writing to {0}".format(output_file))
+    log.info("Creating df")
     result_df = pd.DataFrame(results)
 
     # Filling of NaN values needed
     result_df = result_df.fillna(value=0.0)
-
-    result_df.to_csv(output_file, sep=';')
+    if write_to_csv:
+        log.info("Writing df to {0}".format(output_file))
+        result_df.to_csv(output_file, sep=';')
     end = dt.utcnow()
     log.info("Done! Execution time {}.{} seconds".format(
         str((end - start).seconds), str((end - start).microseconds)[:2],
