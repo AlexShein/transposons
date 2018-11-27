@@ -82,8 +82,12 @@ def parse_line(line):
         else:
             RS[i] = 'NN'
 
-    LB = dict(enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower or x == '_', ls))[:3])))
-    RB = dict(enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower or x == '_', rs))[:3])))
+    LB = dict(
+        enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower() or x == '_', ls[3:]))[:3]))
+    )
+    RB = dict(
+        enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower() or x == '_', rs[3:]))[:3]))
+    )
 
     for i in range(len(loop)):
         LP[i] = loop[i]
