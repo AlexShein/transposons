@@ -67,7 +67,7 @@ def parse_line(line):
     LB = {}
     RB = {}
     LP = {}
-    for i in range(len(ls) - 1, 0, -1):
+    for i in range(len(ls) - 1):
         if ls[i].isupper() and ls[i + 1].isupper():
             LS[i] = ls[i] + ls[i + 1]
         else:
@@ -87,17 +87,20 @@ def parse_line(line):
     )
 
 
-def get_dinucleotides_properties_dict(pairs, name, properties_df):
+def get_dinucleotides_properties_dict(pairs, name, properties_df, revert=False):
     """
     Recieves dict of dinucleotides
     """
     line_dict = {}
 
+    length = len(pairs) - 1
     for i in pairs:
         pair = pairs[i]
         prop_values = properties_df[properties_df['Dinucleotide'] == pair]
         for prop in PROPERTIES:
-            line_dict[name + str(i) + '_' + prop.replace(' (RNA)', '')] = float(prop_values[prop])
+            line_dict[
+                name + str(revert and length - i or i) + '_' + prop.replace(' (RNA)', '')
+            ] = float(prop_values[prop])
     return line_dict
 
 
@@ -148,7 +151,7 @@ def process_lines(lines):
     for line in filter(lambda x: len(x.split('\t')) >= 7, lines):
         LS, LB, RB, LP, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(
-            LS, 'LS', properties_df
+            LS, 'LS', properties_df, revert=True,
         )
         line_dict.update(count_statistics(sequence))
         line_dict.update(get_loop_binary_features('LP', LP))
