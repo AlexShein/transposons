@@ -8,9 +8,6 @@ from datetime import datetime as dt
 
 import pandas as pd
 
-LS = ('LS0', 'LS1', 'LS2', 'LS3', 'LS4', 'LS5', 'LS6', 'LS7', 'LS8', 'LS9')
-RS = ('RS0', 'RS1', 'RS2', 'RS3', 'RS4', 'RS5', 'RS6', 'RS7', 'RS8', 'RS9')
-LOOP = ('LP0', 'LP1', 'LP2', 'LP3', 'LP4', 'LP5', 'LP6', 'LP7', 'LP8', 'LP9')
 PROPERTIES = (
     'Shift (RNA)',
     'Slide (RNA)',
@@ -62,12 +59,11 @@ def parse_line(line):
     Returns parsed line - left and right stems, loop and bulges
     """
     splitted_line = list(filter(bool, line.split('\t')))
-    ls = splitted_line[4][::-1][:10]
+    ls = splitted_line[4][-10:]
     rs = splitted_line[5][:10]
     loop = splitted_line[6][:5]
 
     LS = {}
-    RS = {}
     LB = {}
     RB = {}
     LP = {}
@@ -76,11 +72,6 @@ def parse_line(line):
             LS[i] = ls[i] + ls[i + 1]
         else:
             LS[i] = 'NN'
-    for i in range(len(rs) - 1):
-        if rs[i].isupper() and rs[i + 1].isupper():
-            RS[i] = rs[i] + rs[i + 1]
-        else:
-            RS[i] = 'NN'
 
     LB = dict(
         enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower() or x == '_', ls[3:]))[:3]))
@@ -92,7 +83,7 @@ def parse_line(line):
     for i in range(len(loop)):
         LP[i] = loop[i]
     return (
-        LS, RS, LB, RB, LP, ls + loop + rs,
+        LS, LB, RB, LP, ls + loop + rs,
     )
 
 
@@ -155,13 +146,10 @@ def process_lines(lines):
     )
     processed_lines = []
     for line in filter(lambda x: len(x.split('\t')) >= 7, lines):
-        LS, RS, LB, RB, LP, sequence = parse_line(line)
+        LS, LB, RB, LP, sequence = parse_line(line)
         line_dict = get_dinucleotides_properties_dict(
             LS, 'LS', properties_df
         )
-        line_dict.update(get_dinucleotides_properties_dict(
-            RS, 'RS', properties_df
-        ))
         line_dict.update(count_statistics(sequence))
         line_dict.update(get_loop_binary_features('LP', LP))
         line_dict.update(get_loop_binary_features('LB', LB))
