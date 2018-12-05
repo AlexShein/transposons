@@ -93,13 +93,14 @@ def get_dinucleotides_properties_dict(pairs, name, properties_df, revert=False):
     """
     line_dict = {}
 
-    length = len(pairs) - 1
+    length = len(pairs)
     for i in pairs:
         pair = pairs[i]
         prop_values = properties_df[properties_df['Dinucleotide'] == pair]
         for prop in PROPERTIES:
+            pos = length - i - 1 if revert else i
             line_dict[
-                name + str(revert and length - i or i) + '_' + prop.replace(' (RNA)', '')
+                name + str(pos) + '_' + prop.replace(' (RNA)', '')
             ] = float(prop_values[prop])
     return line_dict
 
