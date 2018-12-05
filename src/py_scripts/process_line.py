@@ -67,14 +67,14 @@ def parse_line(line):
     LB = {}
     RB = {}
     LP = {}
-    for i in range(len(ls) - 1):
+    for i in range(len(ls) - 1, 0, -1):
         if ls[i].isupper() and ls[i + 1].isupper():
             LS[i] = ls[i] + ls[i + 1]
         else:
             LS[i] = 'NN'
 
     LB = dict(
-        enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower() or x == '_', ls[3:]))[:3]))
+        enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower() or x == '_', ls[::-1][3:]))[:3]))
     )
     RB = dict(
         enumerate(map(lambda x: x.upper(), list(filter(lambda x: x.islower() or x == '_', rs[3:]))[:3]))
