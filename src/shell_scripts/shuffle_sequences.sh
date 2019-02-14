@@ -7,6 +7,7 @@ COUNTER=0
 # First arg: target path
 # Second arg: result path
 # Third arg: prefix for files
+# Example: src/shell_scripts/shuffle_sequences.sh data/L1/data/50_last/ data/L1/data/shuffled_50_last/ 1_
 
 LEN=$(ls $1 | wc -l)
 
