@@ -12,7 +12,7 @@ LEN=$(ls $1 | wc -l)
 
 for filename in $(ls $1); do
     SEQ=$(tail -n1 $1$filename | fold -w1 | shuf | tr -d '\n')
-    echo $SEQ >> "$2$filename$3"
+    echo $SEQ >> "$2$3$filename"
     COUNTER=$[COUNTER + 1]
     if (($(($COUNTER%100)) == 0))
     then
