@@ -34,6 +34,7 @@ TRINUCLEOTIDES = [
 ]
 
 
+
 def get_triplets(lst):
     """
     [4,5,6,7,8] -> [(4, 5, 6), (5, 6, 7), (6, 7, 8)]
