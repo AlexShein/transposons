@@ -12,7 +12,8 @@ COUNTER=0
 LEN=$(ls $1 | wc -l)
 
 for filename in $(ls $1); do
-    SEQ=$(tail -n1 $1$filename | fold -w1 | shuf | tr -d '\n')
+    # SEQ=$(tail -n1 $1$filename | fold -w1 | shuf | tr -d '\n')
+    SEQ=$(tail -n1 $1$filename | ../py_scripts/altschulEriksonDinuclShuffle.py)
     echo $SEQ >> "$2$3$filename"
     COUNTER=$[COUNTER + 1]
     if (($(($COUNTER%100)) == 0))
