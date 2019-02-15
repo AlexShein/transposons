@@ -10,7 +10,6 @@
 
 
 import random
-import string
 import sys
 
 
@@ -155,7 +154,7 @@ def dinuclShuffle(s):
         del List[prevCh][0]
         prevCh = ch
     L.append(s[-1])
-    t = string.join(L, "")
+    t = ''.join(L)
     return t
 
 
