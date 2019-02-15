@@ -6,7 +6,7 @@
 # function counts only nonoverlapping words, presumably in a left to
 # right fashion.
 
-# Modified by Alexander Shein 2019
+# Modified by Alexander Shein Feb 2019
 
 
 import random
