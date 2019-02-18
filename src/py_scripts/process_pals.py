@@ -53,6 +53,8 @@ def get_random_lines(filename, n_lines=0, omit_first=False, omit_last=False):
                 return [line for line in np.random.choice(lines, size=n_lines, replace=False)]
             else:
                 return lines
+        else:
+            return []
 
 
 def begin_processing(
